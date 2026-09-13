@@ -1,0 +1,377 @@
+﻿  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:479:replace_once('CMakeLists.txt', 'set (wsjt_CSRCS\n', 'set (wsjt_CSRCS\n  ${wsjt_superhound_CSRCS}\n', 'CMake include SuperHound C')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:480:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:481:# 6b) Make legacy OmniRig support optional. Upstream JTDX 2.2.159 makes
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:482:# OmniRig a hard build-time dependency on Windows, even for users who use
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:483:# Hamlib/TCI/HRD/Commander. ONECLICK builds with JTDX_ENABLE_OMNIRIG=OFF,
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:484:# so the normal JTDX radio-control paths remain available without requiring
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:485:# a COM server to be installed merely to compile the program.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:486:replace_once('CMakeLists.txt',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:487:    'option (JTDX_DEBUG_TO_FILE "Write debu to jtdx_debug.txt.")\n',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:488:    'option (JTDX_DEBUG_TO_FILE "Write debu to jtdx_debug.txt.")\noption (JTDX_ENABLE_OMNIRIG "Build legacy OmniRig ActiveX/COM support on Windows." ON)\n',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:489:    'CMake optional OmniRig switch')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:490:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:491:replace_once('CMakeLists.txt',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:631:        save(p, s)
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:632:    print('[SKIP] jplsubs.f modern-gfortran SPLIT collision: already patched')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:633:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:634:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:635:# 7b) TCI reliability: automatic WebSocket reconnect + heartbeat.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:636:# The original JTDX 2.2.159 client only records disconnected/error state;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:637:# do_poll() then throws and the user must manually reopen the TCI connection.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:638:# Keep the implementation deliberately small: one 2 s watchdog timer, WebSocket
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:639:# ping/pong heartbeat, safe RX on disconnect, and automatic audio/sensor restore.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:640:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:641:replace_once('TCITransceiver.hpp',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:642:    '#include <QTimer>\n#include <QEventLoop>\n',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:643:    '#include <QTimer>\n#include <QEventLoop>\n#include <QElapsedTimer>\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:644:    'TCI header QElapsedTimer')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:645:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:646:replace_once('TCITransceiver.hpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:647:    '  void onError(QAbstractSocket::SocketError err);\n  void onConnected();\n  void onDisconnected();\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:648:    '  void onError(QAbstractSocket::SocketError err);\n  void onConnected();\n  void onDisconnected();\n  void onReconnectTimer();\n  void onReconnectReady();\n  void onPong(quint64 elapsedTime, const QByteArray &payload);\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:649:    'TCI reconnect slots')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:650:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:651:replace_once('TCITransceiver.hpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:652:    '  QTimer * tci_timer3_;\n  QEventLoop * tci_loop3_;\n  int nIqBytes;\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:653:    '  QTimer * tci_timer3_;\n  QEventLoop * tci_loop3_;\n  QTimer * reconnect_timer_;\n  QElapsedTimer reconnect_clock_;\n  qint64 last_ping_ms_;\n  qint64 last_pong_ms_;\n  bool reconnecting_;\n  bool stopping_;\n  bool startup_complete_;\n  int nIqBytes;\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:654:    'TCI reconnect members')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:655:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:656:replace_once('TCITransceiver.cpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:657:    '  , tci_timer3_ {nullptr}\n  , tci_loop3_ {nullptr}\n  , wavptr_ {nullptr} \n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:658:    '  , tci_timer3_ {nullptr}\n  , tci_loop3_ {nullptr}\n  , reconnect_timer_ {nullptr}\n  , last_ping_ms_ {0}\n  , last_pong_ms_ {0}\n  , reconnecting_ {false}\n  , stopping_ {false}\n  , startup_complete_ {false}\n  , wavptr_ {nullptr} \n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:659:    'TCI constructor reconnect state')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:660:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:661:old_connected = r'''void TCITransceiver::onConnected()
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:662:{
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:663:    inConnected = true;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:664://    printf("%s(%0.1f) TCI connected\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset());
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:665:#if JTDX_DEBUG_TO_FILE
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:666:    FILE * pFile = fopen (debug_file_.c_str(),"a");
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:667:    fprintf (pFile,"%s(%0.1f) TCI connected\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset());
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:668:    fclose (pFile);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:669:#endif
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:670:}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:671:'''
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:672:new_connected = r'''void TCITransceiver::onConnected()
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:673:{
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:674:    inConnected = true;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:675:    error_.clear();
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:676:    if (reconnect_clock_.isValid()) {
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:677:      qint64 now = reconnect_clock_.elapsed();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:678:      last_ping_ms_ = now;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:679:      last_pong_ms_ = now;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:680:    }
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:681:    if (startup_complete_ && reconnecting_ && !stopping_) {
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:682:      // Let the TCI host send its initial state snapshot first.
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:683:      QTimer::singleShot(700, this, SLOT(onReconnectReady()));
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:684:    }
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:685://    printf("%s(%0.1f) TCI connected\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset());
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:686:#if JTDX_DEBUG_TO_FILE
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:687:    FILE * pFile = fopen (debug_file_.c_str(),"a");
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:688:    fprintf (pFile,"%s(%0.1f) TCI connected%s\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset(), reconnecting_ ? " (reconnect)" : "");
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:689:    fclose (pFile);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:690:#endif
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:691:}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:692:'''
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:693:replace_once('TCITransceiver.cpp', old_connected, new_connected, 'TCI onConnected reconnect')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:694:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:695:old_disconnected = r'''void TCITransceiver::onDisconnected()
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:696:{
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:697:    inConnected = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:698://    printf("%s(%0.1f) TCI disconnected\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset());
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:699:#if JTDX_DEBUG_TO_FILE
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:700:    FILE * pFile = fopen (debug_file_.c_str(),"a");
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:701:    fprintf (pFile,"%s(%0.1f) TCI disconnected\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset());
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:702:    fclose (pFile);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:703:#endif
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:704:}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:705:'''
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:706:new_disconnected = r'''void TCITransceiver::onDisconnected()
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:707:{
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:708:    inConnected = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:709:    tci_Ready = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:710:    stream_audio_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:711:    _power_ = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:712:    busy_rx_frequency_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:713:    busy_mode_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:714:    busy_other_frequency_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:715:    busy_split_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:716:    busy_drive_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:717:    busy_PTT_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:718:    busy_rx2_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:719:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:720:    // A lost TCI host must never leave JTDX logically in TX.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:721:    PTT_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:722:    requested_PTT_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:723:    m_state = Idle;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:724:    update_PTT(false);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:725:    power_ = 0;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:726:    swr_ = 0;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:727:    if (do_pwr_) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:728:      update_power(0);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:729:      update_swr(0);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:730:    }
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:731:    Q_EMIT tci_mod_active(false);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:732:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:733:    // Release any short synchronous waits that were active when the socket died.
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:734:    Q_EMIT tci_done1();
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:735:    Q_EMIT tci_done2();
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:736:    Q_EMIT tci_done3();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:737:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:738:    if (startup_complete_ && !stopping_) reconnecting_ = true;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:739://    printf("%s(%0.1f) TCI disconnected\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset());
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:740:#if JTDX_DEBUG_TO_FILE
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:741:    FILE * pFile = fopen (debug_file_.c_str(),"a");
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:742:    fprintf (pFile,"%s(%0.1f) TCI disconnected - automatic reconnect=%d\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset(), reconnecting_);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:743:    fclose (pFile);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:744:#endif
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:745:}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:746:'''
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:747:replace_once('TCITransceiver.cpp', old_disconnected, new_disconnected, 'TCI onDisconnected safe reconnect')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:748:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:749:reconnect_funcs = r'''
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:750:void TCITransceiver::onPong(quint64 elapsedTime, const QByteArray &payload)
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:751:{
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:752:    (void)elapsedTime;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:753:    (void)payload;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:754:    if (reconnect_clock_.isValid()) last_pong_ms_ = reconnect_clock_.elapsed();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:755:}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:756:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:757:void TCITransceiver::onReconnectTimer()
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:758:{
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:759:    if (stopping_ || !startup_complete_ || !commander_) return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:760:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:761:    QAbstractSocket::SocketState socketState = commander_->state();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:762:    if (socketState == QAbstractSocket::UnconnectedState) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:763:      inConnected = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:764:      tci_Ready = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:765:      reconnecting_ = true;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:766:      error_.clear();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:767:      commander_->open(url_);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:768:      return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:769:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:770:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:771:    if (socketState != QAbstractSocket::ConnectedState) return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:772:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:773:    if (!reconnect_clock_.isValid()) {
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:774:      reconnect_clock_.start();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:775:      last_ping_ms_ = 0;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:776:      last_pong_ms_ = 0;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:777:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:778:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:779:    qint64 now = reconnect_clock_.elapsed();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:780:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:781:    // A TCP/WebSocket connection can remain nominally "connected" after a
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:782:    // network failure. Ping detects this stale-socket case.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:783:    if (now - last_pong_ms_ > 30000) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:784:      inConnected = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:785:      tci_Ready = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:786:      reconnecting_ = true;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:787:      commander_->abort();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:788:      return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:789:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:790:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:791:    if (now - last_ping_ms_ >= 10000) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:792:      last_ping_ms_ = now;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:793:      commander_->ping(QByteArray("JTDX-TCI"));
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:794:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:795:}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:796:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:797:void TCITransceiver::onReconnectReady()
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:798:{
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:799:    if (stopping_ || !startup_complete_ || !reconnecting_ || !inConnected || !commander_) return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:800:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:801:    // Wait for the host's "start" state. If it arrives later, Cmd_Start
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:802:    // schedules this routine again.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:803:    if (!_power_) return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:804:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:805:    error_.clear();
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:806:    tci_Ready = true;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:807:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:808:    // Never restore a pre-drop TX state.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:809:    if (PTT_ && use_for_ptt_) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:810:      QString cmd;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:811:      if (ESDR3) cmd = CmdTrx + SmDP + rx_ + SmCM + SmFalse + SmCM + "tci" + SmTZ;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:812:      else cmd = CmdTrx + SmDP + rx_ + SmCM + SmFalse + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:813:      sendTextMessage(cmd);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:814:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:815:    PTT_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:816:    requested_PTT_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:817:    busy_PTT_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:818:    update_PTT(false);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:819:    m_state = Idle;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:820:    Q_EMIT tci_mod_active(false);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:821:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:822:    // Re-apply JTDX's requested rig state after a TCI server restart.  The
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:823:    // requested_* values survive the drop, while *_ state is refreshed by
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:824:    // the host snapshot received just after WebSocket connect.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:825:    if (!requested_mode_.isEmpty() && requested_mode_ != mode_)
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:826:      sendTextMessage(mode_to_command(requested_mode_));
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:827:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:828:    if (!requested_rx_frequency_.isEmpty() && requested_rx_frequency_ != rx_frequency_) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:829:      const QString cmd = CmdVFO + SmDP + rx_ + SmCM + "0" + SmCM + requested_rx_frequency_ + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:830:      sendTextMessage(cmd);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:831:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:832:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:833:    if (requested_split_ != split_) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:834:      const QString cmd = CmdSplitEnable + SmDP + rx_ + SmCM + (requested_split_ ? SmTrue : SmFalse) + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:835:      sendTextMessage(cmd);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:836:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:837:    if (requested_split_ && !requested_other_frequency_.isEmpty() && requested_other_frequency_ != other_frequency_) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:838:      const QString cmd = CmdVFO + SmDP + rx_ + SmCM + "1" + SmCM + requested_other_frequency_ + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:839:      sendTextMessage(cmd);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:840:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:841:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:842:    if (!requested_drive_.isEmpty() && requested_drive_ != drive_) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:843:      QString cmd;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:844:      if (ESDR3) cmd = CmdDrive + SmDP + rx_ + SmCM + requested_drive_ + SmTZ;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:845:      else cmd = CmdDrive + SmDP + requested_drive_ + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:846:      sendTextMessage(cmd);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:847:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:848:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:849:    // Re-arm subscriptions that are lost when the TCI server process restarts.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:850:    if (HPSDR) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:851:      const QString cmd = CmdSplitEnable + SmDP + rx_ + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:852:      sendTextMessage(cmd);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:853:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:854:    if (ESDR3) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:855:      const QString rxSensors = CmdRxSensorsEnable + SmDP + (do_snr_ ? SmTrue : SmFalse) + SmCM + "500" + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:856:      sendTextMessage(rxSensors);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:857:      const QString txSensors = CmdTxSensorsEnable + SmDP + (do_pwr_ ? SmTrue : SmFalse) + SmCM + "500" + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:858:      sendTextMessage(txSensors);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:859:    } else if (do_snr_) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:860:      const QString cmd = CmdSmeter + SmDP + rx_ + SmCM + "0" + SmTZ;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:861:      sendTextMessage(cmd);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:862:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:863:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:864:    if (tci_audio_) {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:865:      stream_audio_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:866:      requested_stream_audio_ = true;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:867:      stream_audio(true);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:868:    }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:869:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:870:    reconnecting_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:871:#if JTDX_DEBUG_TO_FILE
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:872:    FILE * pFile = fopen (debug_file_.c_str(),"a");
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:873:    fprintf (pFile,"%s(%0.1f) TCI automatic reconnect complete\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset());
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:874:    fclose (pFile);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:875:#endif
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:876:}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:877:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:878:'''
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:879:insert_after_once('TCITransceiver.cpp', new_disconnected, reconnect_funcs, 'TCI reconnect timer/heartbeat functions')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:880:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:881:replace_once('TCITransceiver.cpp',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:882:    '  m_jtdxtime = jtdxtime;\n  if (wrapped_) wrapped_->start (0,m_jtdxtime);\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:883:    '  m_jtdxtime = jtdxtime;\n  stopping_ = false;\n  startup_complete_ = false;\n  reconnecting_ = false;\n  error_.clear();\n  if (wrapped_) wrapped_->start (0,m_jtdxtime);\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:884:    'TCI do_start reconnect reset')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:885:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:886:replace_once('TCITransceiver.cpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:887:    '      connect(commander_,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(onError(QAbstractSocket::SocketError)));\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:888:    '      connect(commander_,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(onError(QAbstractSocket::SocketError)));\n      connect(commander_, &QWebSocket::pong, this, &TCITransceiver::onPong);\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:889:    'TCI WebSocket pong connection')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:890:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:891:replace_once('TCITransceiver.cpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:892:    '    if (stream_audio_) do_audio(true);\n\n    TRACE_CAT ("TCITransceiver", "started");\n',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:893:    '''    if (stream_audio_) do_audio(true);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:894:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:895:    if (!reconnect_timer_) {
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:896:      reconnect_timer_ = new QTimer {this};
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:897:      reconnect_timer_->setInterval(2000);
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:898:      connect(reconnect_timer_, &QTimer::timeout, this, &TCITransceiver::onReconnectTimer);
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:899:    }
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:900:    reconnect_clock_.start();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:901:    last_ping_ms_ = 0;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:902:    last_pong_ms_ = 0;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:903:    startup_complete_ = true;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:904:    reconnecting_ = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:905:    reconnect_timer_->start();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:906:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:907:    TRACE_CAT ("TCITransceiver", "started");
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:908:''',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:909:    'TCI start reconnect watchdog')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:910:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:911:replace_once('TCITransceiver.cpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:912:    'void TCITransceiver::do_stop ()\n{\n//  printf ("TCI close\\n");\n  if (!commander_) return;\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:913:    '''void TCITransceiver::do_stop ()
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:914:{
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:915:  stopping_ = true;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:916:  startup_complete_ = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:917:  reconnecting_ = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:918:  if (reconnect_timer_) {
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:919:    reconnect_timer_->stop();
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:920:    delete reconnect_timer_;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:921:    reconnect_timer_ = nullptr;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:922:  }
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:923://  printf ("TCI close\\n");
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:924:  if (!commander_) return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:925:''',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:926:    'TCI stop disables reconnect')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:927:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:928:replace_once('TCITransceiver.cpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:929:    '  if (/*!inConnected && */!error_.isEmpty()) {tci_Ready = false; throw error {error_};}\n  else if (!tci_Ready) throw error {tr ("TCI could not be opened")};\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:930:    '''  // During a temporary TCI outage keep the transceiver object alive.
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:931:  // The reconnect watchdog restores the socket; do not force the user to
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:932:  // reopen Settings | Radio.
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:933:  if (!inConnected || !tci_Ready) return;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:934:  if (!error_.isEmpty()) {tci_Ready = false; throw error {error_};}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:935:''',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:936:    'TCI do_poll nonfatal outage')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:937:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:938:replace_once('TCITransceiver.cpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:939:    '        if (!inConnected && !error_.isEmpty()) throw error {error_};\n//        if (!inConnected){ PTT_ = on; update_PTT(on); return; }\n        else if (busy_PTT_ || !tci_Ready || !_power_) return;\n',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:940:    '''        if (!inConnected || !tci_Ready || !_power_) {
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:941:          // Fail safe: a reconnect can never arm TX.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:942:          requested_PTT_ = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:943:          return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:944:        }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:945:        else if (busy_PTT_) return;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:946:''',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:947:    'TCI PTT fail-safe during reconnect')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:948:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:949:replace_once('TCITransceiver.cpp',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:950:    '          _power_ = true;\n//          printf ("cmdstart done1\\n");\n          if (tci_Ready) tci_done1();\n',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:951:    '''          _power_ = true;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:952:          if (startup_complete_ && reconnecting_ && inConnected && !stopping_)
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:953:            QTimer::singleShot(250, this, SLOT(onReconnectReady()));
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:954://          printf ("cmdstart done1\\n");
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:955:          if (tci_Ready) tci_done1();
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:956:''',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:957:    'TCI Cmd_Start resumes reconnect')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:958:
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:959:replace_once('TCITransceiver.cpp',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:960:    '''          _power_ = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:961:          if (tci_timer1_->isActive()) { /*printf ("cmdstop done1\\n");*/ tci_done1();}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:962:          else {
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:963:            tci_Ready = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:964:          }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:965:''',
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:966:    '''          _power_ = false;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:967:          if (startup_complete_ && !stopping_) reconnecting_ = true;
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:968:          if (tci_timer1_->isActive()) { /*printf ("cmdstop done1\\n");*/ tci_done1();}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:969:          else {
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:970:            tci_Ready = false;
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:971:          }
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:972:''',
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:973:    'TCI Cmd_Stop marks reconnecting')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:974:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:975:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:976:# 8) Postchecks.
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:977:checks = {
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:978:    'commons.h': ['bool lsuperhound;'],
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:979:    'lib/jt9com.f90': ['logical(c_bool) :: lsuperhound'],
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:980:    'mainwindow.h': ['on_actionEnable_superhound_mode_toggled', 'm_superHoundMode', 'm_superHoundArmed', 'm_superHoundFoxCall'],
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:981:    'mainwindow.cpp': ['dec_data.params.lsuperhound', 'SuperHound RX active at 750 Hz', 'SuperHound armed for %1', 'integrated monitor at the bottom', 'embedded monitor has no separate closeEvent', '!m_superHoundMode && !m_config.split_mode()'],
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:986:    'lib/superfox/sfrx_sub_jtdx.f90': ['call qpc_decode2', 'call sfox_unpack'],
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:987:    'lib/superfox/sfox_unpack.f90': ['use packjt, only : unpackgrid', 'unpack28(n28,foxcall,success,1)'],
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:988:    'CMake/Modules/FindFFTW3.cmake': ['Modern MSYS2/MinGW also ships separate FFTW thread import libraries.', 'if (_use_threads)'],
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:989:    'lib/jplsubs.f': ['SUBROUTINE JPL_SPLIT(TT,FR)', 'CALL JPL_SPLIT(S,PJD(1))'],
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:990:    'TCITransceiver.hpp': ['onReconnectTimer', 'QElapsedTimer reconnect_clock_', 'startup_complete_'],
+> D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:991:    'TCITransceiver.cpp': ['TCI automatic reconnect complete', 'commander_->ping(QByteArray("JTDX-TCI"))', 'requested_rx_frequency_ != rx_frequency_', 'requested_split_ != split_', 'if (!inConnected || !tci_Ready) return;', 'if (!error_.isEmpty()) {tci_Ready = false; throw error {error_};}', 'Fail safe: a reconnect can never arm TX.'],
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:992:}
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:993:for rel, needles in checks.items():
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:994:    _, s = load(rel)
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:995:    for needle in needles:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:996:        if needle not in s:
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:997:            raise SystemExit(f'[FAIL] postcheck {rel}: missing {needle!r}')
+  D:\a\JTDX_SuperHound\JTDX_SuperHound\audit-extracted\patch_superhound.py:998:print('[PASS] all source postchecks')
