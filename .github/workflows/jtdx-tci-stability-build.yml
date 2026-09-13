@@ -1,0 +1,135 @@
+name: JTDX FINAL TCI STABILITY OMNIRIG
+
+on:
+  push:
+    branches:
+      - fix/tci-stability-reconnect
+    paths:
+      - 'jtdx-final/apply_tci_stability_omnirig_overlay.py'
+      - '.github/workflows/jtdx-tci-stability-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 150
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconstruct verified FINAL-TCI baseline
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $parts = Get-ChildItem '.\jtdx-final\package.b64.*' | Sort-Object Name
+          if ($parts.Count -ne 11) { throw "Expected 11 package segments, found $($parts.Count)" }
+          $b64 = ($parts | ForEach-Object { (Get-Content $_.FullName -Raw).Trim() }) -join ''
+          $zip = Join-Path $env:RUNNER_TEMP 'JTDX_FINAL_BUILD_INPUT.zip'
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($b64))
+          $actual = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expected = '0412ed99483ca876166dd95983dc65f69eb364521596c2429e8d32e0a4cf9a5d'
+          Write-Host "INPUT_SHA256=$actual"
+          if ($actual -ne $expected) { throw "Build input SHA256 mismatch: $actual" }
+          $dst = Join-Path $env:RUNNER_TEMP 'JTDX_FINAL_BUILD'
+          if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
+          Expand-Archive -Path $zip -DestinationPath $dst -Force
+          "FINAL_ROOT=$dst" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Apply selective TCI stability + native OmniRig overlay
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python "$env:GITHUB_WORKSPACE\jtdx-final\apply_tci_stability_omnirig_overlay.py" "$env:FINAL_ROOT"
+          python -m py_compile "$env:GITHUB_WORKSPACE\jtdx-final\apply_tci_stability_omnirig_overlay.py"
+          python -m py_compile "$env:FINAL_ROOT\patch_superhound.py"
+          Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "MSI_VERSION='2.2.200'" -Quiet | ForEach-Object { if (-not $_) { throw 'MSI version gate missing' } }
+          Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "-DJTDX_ENABLE_OMNIRIG=ON" -Quiet | ForEach-Object { if (-not $_) { throw 'OmniRig enable gate missing' } }
+          Write-Host 'OVERLAY_STATIC_CHECK=PASS'
+
+      - name: Install official OmniRig runtime
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $zip = Join-Path $env:RUNNER_TEMP 'OmniRig-1.20.zip'
+          $dir = Join-Path $env:RUNNER_TEMP 'OmniRig-1.20'
+          Invoke-WebRequest -UseBasicParsing -Uri 'https://www.dxatlas.com/OmniRig/Files/OmniRig.zip' -OutFile $zip
+          $sha = (Get-FileHash $zip -Algorithm SHA256).Hash.ToUpperInvariant()
+          Write-Host "OMNIRIG_ZIP_SHA256=$sha"
+          if ($sha -ne '46654EC3BA2FE9FF23A21EDAA657C46E0E9867B62B254968A3C4436DD81531A8') { throw 'Official OmniRig 1.20 package SHA-256 mismatch' }
+          New-Item -ItemType Directory -Force -Path $dir | Out-Null
+          Expand-Archive -Path $zip -DestinationPath $dir -Force
+          $setup = Join-Path $dir 'OmniRigSetup.exe'
+          if (-not (Test-Path $setup)) { throw 'OmniRigSetup.exe missing' }
+          $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "OmniRig installer exit code $($p.ExitCode)" }
+          Write-Host 'OMNIRIG_RUNTIME_INSTALL=PASS'
+
+      - name: Setup MSYS2 MINGW64
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          location: C:\msys64
+          update: true
+          cache: false
+          install: >-
+            git
+            make
+            patch
+            pkgconf
+            autoconf
+            automake
+            libtool
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-gcc-fortran
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-fftw
+            mingw-w64-x86_64-libusb
+            mingw-w64-x86_64-qt5-base
+            mingw-w64-x86_64-qt5-activeqt
+            mingw-w64-x86_64-qt5-multimedia
+            mingw-w64-x86_64-qt5-serialport
+            mingw-w64-x86_64-qt5-tools
+            mingw-w64-x86_64-qt5-websockets
+
+      - name: Verify OmniRig COM through Qt dumpcpp
+        shell: msys2 {0}
+        run: |
+          set -e
+          export PATH="/mingw64/bin:/usr/bin:$PATH"
+          command -v dumpcpp
+          AXSERVER="$(dumpcpp -getfile {4FE359C5-A58F-459D-BE95-CA559FB4F270} | tr -d '\r')"
+          test -n "$AXSERVER"
+          echo "OMNIRIG_AXSERVER=$AXSERVER"
+          echo 'OMNIRIG_DUMPCPP_DISCOVERY=PASS'
+
+      - name: Build MSI
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1"
+
+      - name: Verify result
+        if: success()
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msi = @(Get-ChildItem "$env:FINAL_ROOT\OUTPUT" -Filter '*.msi' -File -Recurse)
+          if ($msi.Count -ne 1) { throw "Expected exactly one MSI, found $($msi.Count)" }
+          if ($msi[0].Length -lt 1MB) { throw 'MSI unexpectedly small' }
+          $sha = (Get-FileHash $msi[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          Write-Host "FINAL_MSI=$($msi[0].Name)"
+          Write-Host "FINAL_MSI_SIZE=$($msi[0].Length)"
+          Write-Host "FINAL_MSI_SHA256=$sha"
+
+      - name: Upload MSI and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: JTDX-FINAL-TCI-STABILITY-OMNIRIG
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            ${{ env.FINAL_ROOT }}/OUTPUT/**
+            ${{ env.FINAL_ROOT }}/LOGS/**
