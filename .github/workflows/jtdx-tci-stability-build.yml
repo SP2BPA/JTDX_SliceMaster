@@ -1,5 +1,5 @@
 name: JTDX FINAL TCI STABILITY OMNIRIG
-# rerun after verified value() accessor correction
+# rerun after dumpcpp-qt5 ActiveQt naming correction
 
 on:
   push:
@@ -46,6 +46,7 @@ jobs:
           Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "MSI_VERSION='2.2.200'" -Quiet | ForEach-Object { if (-not $_) { throw 'MSI version gate missing' } }
           Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "-DJTDX_ENABLE_OMNIRIG=ON" -Quiet | ForEach-Object { if (-not $_) { throw 'OmniRig enable gate missing' } }
           Select-String -Path "$env:FINAL_ROOT\patch_superhound.py" -SimpleMatch "args.value(index)" -Quiet | ForEach-Object { if (-not $_) { throw 'TCI safe accessor gate missing' } }
+          Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "dumpcpp-qt5" -Quiet | ForEach-Object { if (-not $_) { throw 'dumpcpp-qt5 compatibility gate missing' } }
           Write-Host 'OVERLAY_STATIC_CHECK=PASS'
 
       - name: Install official OmniRig runtime
@@ -100,8 +101,8 @@ jobs:
         run: |
           set -e
           export PATH="/mingw64/bin:/usr/bin:$PATH"
-          command -v dumpcpp
-          AXSERVER="$(dumpcpp -getfile {4FE359C5-A58F-459D-BE95-CA559FB4F270} | tr -d '\r')"
+          command -v dumpcpp-qt5
+          AXSERVER="$(dumpcpp-qt5 -getfile {4FE359C5-A58F-459D-BE95-CA559FB4F270} | tr -d '\r')"
           test -n "$AXSERVER"
           echo "OMNIRIG_AXSERVER=$AXSERVER"
           echo 'OMNIRIG_DUMPCPP_DISCOVERY=PASS'
