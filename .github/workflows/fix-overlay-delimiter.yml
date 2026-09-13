@@ -1,0 +1,40 @@
+name: Fix TCI overlay delimiter
+
+on:
+  push:
+    branches:
+      - fix/tci-stability-reconnect
+    paths:
+      - '.github/workflows/fix-overlay-delimiter.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix nested Python string delimiter
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('jtdx-final/apply_tci_stability_omnirig_overlay.py')
+          s = p.read_text(encoding='utf-8')
+          old_open = "    block = r'''\n"
+          new_open = '    block = r"""\n'
+          old_close = "print('[PASS] selective TCI stability/reconnect hardening')\n'''\n    s += block\n"
+          new_close = "print('[PASS] selective TCI stability/reconnect hardening')\n\"\"\"\n    s += block\n"
+          if s.count(old_open) != 1:
+              raise SystemExit(f'opening delimiter count={s.count(old_open)}')
+          if s.count(old_close) != 1:
+              raise SystemExit(f'closing delimiter count={s.count(old_close)}')
+          s = s.replace(old_open, new_open, 1).replace(old_close, new_close, 1)
+          p.write_text(s, encoding='utf-8', newline='\n')
+      - name: Commit fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add jtdx-final/apply_tci_stability_omnirig_overlay.py
+          git commit -m 'Fix nested Python delimiter in TCI overlay'
+          git push origin HEAD:fix/tci-stability-reconnect
