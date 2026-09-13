@@ -1,0 +1,47 @@
+name: TCI overlay static diagnostic
+
+on:
+  push:
+    branches:
+      - fix/tci-stability-reconnect
+    paths:
+      - '.github/workflows/tci-overlay-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diagnostic:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct baseline and capture overlay result
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $parts = Get-ChildItem '.\jtdx-final\package.b64.*' | Sort-Object Name
+          $b64 = ($parts | ForEach-Object { (Get-Content $_.FullName -Raw).Trim() }) -join ''
+          $zip = Join-Path $env:RUNNER_TEMP 'JTDX_FINAL_BUILD_INPUT.zip'
+          [IO.File]::WriteAllBytes($zip,[Convert]::FromBase64String($b64))
+          $actual=(Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($actual -ne '0412ed99483ca876166dd95983dc65f69eb364521596c2429e8d32e0a4cf9a5d'){throw "baseline hash mismatch $actual"}
+          $dst=Join-Path $env:RUNNER_TEMP 'JTDX_FINAL_BUILD'
+          Expand-Archive $zip $dst -Force
+          $log=Join-Path $env:GITHUB_WORKSPACE 'audit-extracted\OVERLAY_DIAGNOSTIC.txt'
+          New-Item -ItemType Directory -Force -Path (Split-Path $log) | Out-Null
+          $ErrorActionPreference='Continue'
+          $out = & python "$env:GITHUB_WORKSPACE\jtdx-final\apply_tci_stability_omnirig_overlay.py" "$dst" 2>&1
+          $rc=$LASTEXITCODE
+          $out | Tee-Object -FilePath $log
+          "EXIT_CODE=$rc" | Add-Content $log
+          $ErrorActionPreference='Stop'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audit-extracted/OVERLAY_DIAGNOSTIC.txt
+          if(-not (git diff --cached --quiet)) {
+            git commit -m 'Capture TCI overlay diagnostic'
+            git push origin HEAD:fix/tci-stability-reconnect
+          }
+          if($rc -ne 0){throw "overlay failed rc=$rc"}
