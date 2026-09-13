@@ -1,5 +1,5 @@
 name: JTDX FINAL TCI STABILITY OMNIRIG
-# rerun after verified overlay delimiter fix
+# rerun after verified value() accessor correction
 
 on:
   push:
@@ -45,6 +45,7 @@ jobs:
           python -m py_compile "$env:FINAL_ROOT\patch_superhound.py"
           Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "MSI_VERSION='2.2.200'" -Quiet | ForEach-Object { if (-not $_) { throw 'MSI version gate missing' } }
           Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "-DJTDX_ENABLE_OMNIRIG=ON" -Quiet | ForEach-Object { if (-not $_) { throw 'OmniRig enable gate missing' } }
+          Select-String -Path "$env:FINAL_ROOT\patch_superhound.py" -SimpleMatch "args.value(index)" -Quiet | ForEach-Object { if (-not $_) { throw 'TCI safe accessor gate missing' } }
           Write-Host 'OVERLAY_STATIC_CHECK=PASS'
 
       - name: Install official OmniRig runtime
