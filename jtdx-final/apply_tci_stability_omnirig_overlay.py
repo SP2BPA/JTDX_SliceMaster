@@ -10,7 +10,7 @@ if not pp.exists() or not bp.exists():
 s = pp.read_text(encoding='utf-8')
 marker = '# SQ4KOU TCI stability/reconnect hardening over verified FINAL-TCI.'
 if marker not in s:
-    block = r'''
+    block = r"""
 
 # SQ4KOU TCI stability/reconnect hardening over verified FINAL-TCI.
 # Preserve the existing SuperHound/FT2/OmniRig source surface. Only TCI is changed.
@@ -143,7 +143,7 @@ for needle in [
     if needle not in t:
         raise SystemExit(f'[FAIL] TCI stability postcheck missing {needle!r}')
 print('[PASS] selective TCI stability/reconnect hardening')
-'''
+"""
     s += block
     pp.write_text(s, encoding='utf-8', newline='\n')
 
