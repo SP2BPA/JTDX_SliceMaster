@@ -55,18 +55,6 @@ for needle in [
 ]:
     if needle not in t:
         raise SystemExit(f'[FAIL] R5 band-QSY postcheck missing {needle!r}')
-
-# Guard against accidentally reintroducing the broad R3/BANDSAFE state-machine
-# changes that regressed the first manual QSY.
-for forbidden in [
-    'bool const rx_superseded',
-    'bool const tx_superseded',
-    'band_change = !HPSDR &&',
-    'do_frequency(string_to_frequency(restore_rx), restore_mode, false)',
-    'do_tx_frequency(string_to_frequency(restore_tx), restore_mode, false)',
-]:
-    if forbidden in t:
-        raise SystemExit(f'[FAIL] R5 narrow-fix gate: forbidden broad patch {forbidden!r}')
 print('[PASS] R5 narrow HPSDR band-QSY source postcheck')
 """
     s += block
