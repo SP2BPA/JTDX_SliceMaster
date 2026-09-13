@@ -1,4 +1,5 @@
 name: JTDX FINAL TCI STABILITY OMNIRIG
+# rerun after verified overlay delimiter fix
 
 on:
   push:
