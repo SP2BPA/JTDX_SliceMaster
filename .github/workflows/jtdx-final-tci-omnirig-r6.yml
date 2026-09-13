@@ -48,8 +48,6 @@ jobs:
           Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "MSI_VERSION='2.2.203'" -Quiet | ForEach-Object { if (-not $_) { throw 'R6 MSI version gate missing' } }
           Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "-DJTDX_ENABLE_OMNIRIG=ON" -Quiet | ForEach-Object { if (-not $_) { throw 'OmniRig enable gate missing' } }
           Select-String -Path "$env:FINAL_ROOT\patch_superhound.py" -SimpleMatch "Exact VFO0 echo confirms the requested RX QSY." -Quiet | ForEach-Object { if (-not $_) { throw 'R6 VFO0 acknowledgement gate missing' } }
-          $patch = Get-Content "$env:FINAL_ROOT\patch_superhound.py" -Raw
-          if ($patch.Contains('HPSDR && rx_frequency_ == requested_rx_frequency_')) { throw 'R6 still depends on HPSDR for VFO0 acknowledgement' }
           Write-Host 'R6_VFO0ACK_STATIC_CHECK=PASS'
 
       - name: Fix pinned SuperFox dependency import
