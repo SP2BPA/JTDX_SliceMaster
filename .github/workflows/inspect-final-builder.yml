@@ -1,0 +1,36 @@
+name: Inspect FINAL-TCI builder
+
+on:
+  push:
+    branches:
+      - fix/tci-stability-reconnect
+    paths:
+      - '.github/workflows/inspect-final-builder.yml'
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct builder
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $parts = Get-ChildItem '.\jtdx-final\package.b64.*' | Sort-Object Name
+          $b64 = ($parts | ForEach-Object { (Get-Content $_.FullName -Raw).Trim() }) -join ''
+          $zip = Join-Path $env:RUNNER_TEMP 'input.zip'
+          [IO.File]::WriteAllBytes($zip,[Convert]::FromBase64String($b64))
+          $dst = Join-Path $env:RUNNER_TEMP 'pkg'
+          Expand-Archive $zip $dst -Force
+          $p = Join-Path $dst 'BUILD_JTDX_SUPERHOUND_MSI.ps1'
+          $lines = Get-Content $p
+          foreach ($pat in @('TimeoutExe','pacmanArgs','Install/update MSYS2 build dependencies','cmake -S jtdx','CMAKE_PREFIX_PATH','Qt5_DIR')) {
+            Write-Host "===== $pat ====="
+            for($i=0;$i -lt $lines.Count;$i++) {
+              if($lines[$i] -match [regex]::Escape($pat)) {
+                $a=[Math]::Max(0,$i-8); $b=[Math]::Min($lines.Count-1,$i+12)
+                for($j=$a;$j -le $b;$j++){ Write-Host (("{0,4}: {1}" -f ($j+1),$lines[$j])) }
+              }
+            }
+          }
