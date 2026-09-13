@@ -1,0 +1,66 @@
+name: TCI baseline extraction audit
+
+on:
+  push:
+    branches:
+      - fix/tci-stability-reconnect
+    paths:
+      - '.github/workflows/tci-baseline-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconstruct exact FINAL-TCI baseline
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $parts = Get-ChildItem '.\jtdx-final\package.b64.*' | Sort-Object Name
+          if ($parts.Count -ne 11) { throw "Expected 11 package segments, found $($parts.Count)" }
+          $b64 = ($parts | ForEach-Object { (Get-Content $_.FullName -Raw).Trim() }) -join ''
+          $zip = Join-Path $env:RUNNER_TEMP 'JTDX_FINAL_BUILD_INPUT.zip'
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($b64))
+          $actual = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expected = '0412ed99483ca876166dd95983dc65f69eb364521596c2429e8d32e0a4cf9a5d'
+          Write-Host "INPUT_SHA256=$actual"
+          if ($actual -ne $expected) { throw "Build input SHA256 mismatch: $actual" }
+          $dst = Join-Path $env:RUNNER_TEMP 'JTDX_FINAL_BUILD'
+          if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
+          Expand-Archive -Path $zip -DestinationPath $dst -Force
+          "FINAL_ROOT=$dst" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Export exact TCI-relevant build logic
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $out = Join-Path $env:GITHUB_WORKSPACE 'audit-extracted'
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          foreach ($name in @('patch_superhound.py','BUILD_JTDX_SUPERHOUND_MSI.ps1','PATCHER_SELFTEST_R12.py')) {
+            $src = Join-Path $env:FINAL_ROOT $name
+            if (-not (Test-Path $src)) { throw "Missing expected baseline file: $name" }
+            Copy-Item $src (Join-Path $out $name) -Force
+          }
+          $patcher = Join-Path $out 'patch_superhound.py'
+          $matches = Select-String -Path $patcher -Pattern 'TCI|reconnect|band_change|busy_rx_frequency|busy_tx_frequency|onConnected|onDisconnected|SocketError|sendTextMessage' -Context 4,8
+          $matches | ForEach-Object { $_.ToString() } | Set-Content (Join-Path $out 'TCI_MATCHES.txt') -Encoding utf8
+
+      - name: Commit audit snapshot
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audit-extracted
+          if (git diff --cached --quiet) {
+            Write-Host 'No audit changes to commit'
+            exit 0
+          }
+          git commit -m 'Capture exact FINAL-TCI patcher for TCI audit'
+          git push origin HEAD:fix/tci-stability-reconnect
