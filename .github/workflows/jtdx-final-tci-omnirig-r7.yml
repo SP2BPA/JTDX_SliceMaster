@@ -49,7 +49,7 @@ jobs:
           Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "MSI_VERSION='2.2.204'" -Quiet | ForEach-Object { if (-not $_) { throw 'R7 MSI version gate missing' } }
           Select-String -Path "$env:FINAL_ROOT\BUILD_JTDX_SUPERHOUND_MSI.ps1" -SimpleMatch "-DJTDX_ENABLE_OMNIRIG=ON" -Quiet | ForEach-Object { if (-not $_) { throw 'OmniRig enable gate missing' } }
           Select-String -Path "$env:FINAL_ROOT\patch_superhound.py" -SimpleMatch "QElapsedTimer rx_ack_wait;" -Quiet | ForEach-Object { if (-not $_) { throw 'R7 target-specific RX acknowledgement gate missing' } }
-          Select-String -Path "$env:FINAL_ROOT\patch_superhound.py" -SimpleMatch "error_ = tr (\"TCI failed set rxfreq\");" -Quiet | ForEach-Object { if (-not $_) { throw 'R7 real RX failure path was lost' } }
+          Select-String -Path "$env:FINAL_ROOT\patch_superhound.py" -SimpleMatch 'error_ = tr ("TCI failed set rxfreq");' -Quiet | ForEach-Object { if (-not $_) { throw 'R7 real RX failure path was lost' } }
           Write-Host 'R7_RXACK_STATIC_CHECK=PASS'
 
       - name: Fix pinned SuperFox dependency import
