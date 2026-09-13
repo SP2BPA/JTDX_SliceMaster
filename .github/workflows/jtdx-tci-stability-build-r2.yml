@@ -1,4 +1,4 @@
-name: JTDX FINAL TCI STABILITY OMNIRIG R2
+name: JTDX FINAL TCI STABILITY OMNIRIG R3
 
 on:
   push:
@@ -77,6 +77,50 @@ jobs:
           '@ | Set-Content -Path $fix -Encoding UTF8
           python $fix $builder
           Select-String -Path $builder -SimpleMatch 'cp -f "$WSJTX_CACHE/lib/smo121.f90" jtdx/lib/superfox/smo121.f90' -Quiet | ForEach-Object { if (-not $_) { throw 'SuperFox smo121 import gate missing' } }
+
+      - name: Fix ActiveQt generated-file gate ordering
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $builder = Join-Path $env:FINAL_ROOT 'BUILD_JTDX_SUPERHOUND_MSI.ps1'
+          $fix = Join-Path $env:RUNNER_TEMP 'fix_omnirig_gate.py'
+          @'
+          from pathlib import Path
+          import sys
+          p = Path(sys.argv[1])
+          s = p.read_text(encoding='utf-8')
+          old = '''if ! find jtdx/build-superhound -type f -iname 'OmniRig.h' -print -quit | grep -q .; then
+            echo '[FAIL] generated OmniRig ActiveQt wrapper header missing'
+            exit 42
+          fi
+          echo '[PASS] OmniRig configure/source/generator gates'
+
+          cmake --build jtdx/build-superhound --parallel'''
+          new = '''if ! grep -Fiq 'OmniRig.cpp' jtdx/build-superhound/build.ninja; then
+            echo '[FAIL] OmniRig ActiveQt generation rule missing from Ninja graph'
+            exit 42
+          fi
+          echo '[PASS] OmniRig configure/source/generator-rule gates'
+
+          cmake --build jtdx/build-superhound --parallel
+
+          if ! find jtdx/build-superhound -type f -iname 'OmniRig.h' -print -quit | grep -q .; then
+            echo '[FAIL] generated OmniRig ActiveQt wrapper header missing after build'
+            exit 43
+          fi
+          if ! find jtdx/build-superhound -type f -iname 'OmniRig.cpp' -print -quit | grep -q .; then
+            echo '[FAIL] generated OmniRig ActiveQt wrapper source missing after build'
+            exit 44
+          fi
+          echo '[PASS] generated OmniRig ActiveQt wrapper files' '''
+          if old not in s:
+              raise SystemExit('[FAIL] OmniRig premature generated-file gate anchor missing')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8', newline='\n')
+          print('[PASS] OmniRig generated-file gate moved after cmake --build')
+          '@ | Set-Content -Path $fix -Encoding UTF8
+          python $fix $builder
+          Select-String -Path $builder -SimpleMatch "[PASS] generated OmniRig ActiveQt wrapper files" -Quiet | ForEach-Object { if (-not $_) { throw 'OmniRig post-build generated-file gate missing' } }
 
       - name: Install official OmniRig runtime
         shell: powershell
@@ -160,7 +204,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: JTDX-FINAL-TCI-STABILITY-OMNIRIG-R2
+          name: JTDX-FINAL-TCI-STABILITY-OMNIRIG-R3
           if-no-files-found: warn
           retention-days: 14
           path: |
