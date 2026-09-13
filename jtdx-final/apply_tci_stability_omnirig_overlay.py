@@ -178,11 +178,18 @@ if '-DJTDX_ENABLE_OMNIRIG=ON' not in b:
     b = b.replace('-DJTDX_ENABLE_OMNIRIG=OFF', '-DJTDX_ENABLE_OMNIRIG=ON', 1)
 
 old_tools = 'for t in git gcc g++ gfortran cmake ninja autoconf automake libtoolize make pkg-config patch qmake-qt5 lrelease-qt5; do\n'
-new_tools = 'for t in git gcc g++ gfortran cmake ninja autoconf automake libtoolize make pkg-config patch qmake-qt5 lrelease-qt5 dumpcpp; do\n'
+new_tools = 'for t in git gcc g++ gfortran cmake ninja autoconf automake libtoolize make pkg-config patch qmake-qt5 lrelease-qt5 dumpcpp-qt5; do\n'
 if new_tools not in b:
     if b.count(old_tools) != 1:
         raise SystemExit(f'[FAIL] OmniRig tool gate anchor count={b.count(old_tools)}')
     b = b.replace(old_tools, new_tools, 1)
+
+alias_anchor = 'ln -sf /mingw64/bin/windeployqt-qt5.exe \"$WORK/bin/windeployqt.exe\"\n'
+alias_new = alias_anchor + 'ln -sf /mingw64/bin/dumpcpp-qt5.exe \"$WORK/bin/dumpcpp.exe\"\n'
+if alias_new not in b:
+    if b.count(alias_anchor) != 1:
+        raise SystemExit(f'[FAIL] dumpcpp alias anchor count={b.count(alias_anchor)}')
+    b = b.replace(alias_anchor, alias_new, 1)
 
 cmake_anchor = 'rm -rf jtdx/build-superhound\ncmake -S jtdx -B jtdx/build-superhound -G Ninja \\\n'
 preflight = '''# Native OmniRig COM preflight.\nOMNIRIG_AXSERVER="$(dumpcpp -getfile {4FE359C5-A58F-459D-BE95-CA559FB4F270} 2>/dev/null | tr -d '\\r' || true)"\nif [ -z "$OMNIRIG_AXSERVER" ]; then\n  echo '[FAIL] OmniRig COM server/type library is not registered on this Windows host'\n  exit 38\nfi\necho "[PASS] OmniRig COM type library: $OMNIRIG_AXSERVER"\n\nrm -rf jtdx/build-superhound\ncmake -S jtdx -B jtdx/build-superhound -G Ninja \\\n'''
@@ -215,7 +222,7 @@ bp.write_text(b, encoding='utf-8', newline='\n')
 for needle in [
     marker,
     '-DJTDX_ENABLE_OMNIRIG=ON',
-    'lrelease-qt5 dumpcpp',
+    'lrelease-qt5 dumpcpp-qt5',
     '[PASS] OmniRig COM type library:',
     'JTDX_ENABLE_OMNIRIG:BOOL=ON',
     "MSI_VERSION='2.2.200'",
