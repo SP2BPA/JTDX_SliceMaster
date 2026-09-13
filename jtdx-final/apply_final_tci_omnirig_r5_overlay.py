@@ -21,7 +21,7 @@ if not pp.exists() or not bp.exists():
 s = pp.read_text(encoding='utf-8')
 marker = '# SQ4KOU R5: HPSDR band-QSY may complete on matching VFO0 acknowledgement.'
 if marker not in s:
-    block = r'''
+    block = r"""
 
 # SQ4KOU R5: HPSDR band-QSY may complete on matching VFO0 acknowledgement.
 # FINAL-TCI normally keeps a >1 MHz RX QSY busy until a VFO1 echo arrives.
@@ -68,7 +68,7 @@ for forbidden in [
     if forbidden in t:
         raise SystemExit(f'[FAIL] R5 narrow-fix gate: forbidden broad patch {forbidden!r}')
 print('[PASS] R5 narrow HPSDR band-QSY source postcheck')
-'''
+"""
     s += block
     pp.write_text(s, encoding='utf-8', newline='\n')
 
