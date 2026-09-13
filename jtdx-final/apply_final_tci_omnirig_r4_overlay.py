@@ -72,6 +72,15 @@ print('[PASS] R4 native FINAL-TCI QSY/reconnect path retained')
 
 b = bp.read_text(encoding='utf-8')
 
+# The FINAL builder used a 180 s pacman watchdog. On current GitHub Windows runners
+# the official MSYS2 dependency transaction can legitimately take just over 3 min,
+# and killing pacman mid-transaction leaves Qt5 metadata incomplete. Give pacman
+# enough time to finish atomically instead of retrying from a damaged local DB.
+if "'600s'," not in b:
+    if b.count("'180s',") != 1:
+        raise SystemExit(f'[FAIL] pacman timeout anchor count={b.count("\'180s\',")}')
+    b = b.replace("'180s',", "'600s',", 1)
+
 # Enable the already-present native JTDX OmniRig backend; no parallel CAT implementation.
 if '-DJTDX_ENABLE_OMNIRIG=ON' not in b:
     if b.count('-DJTDX_ENABLE_OMNIRIG=OFF') != 1:
@@ -92,8 +101,17 @@ if alias_new not in b:
         raise SystemExit(f'[FAIL] dumpcpp alias anchor count={b.count(alias_anchor)}')
     b = b.replace(alias_anchor, alias_new, 1)
 
+# Pin Qt5 explicitly as well as through CMAKE_PREFIX_PATH. This prevents a stale or
+# partially refreshed CMake search path from hiding a valid Qt5 installation.
+qt_anchor = '  -DCMAKE_PREFIX_PATH="$HAMLIB_PREFIX_WIN;C:/msys64/mingw64" \\\n'
+qt_line = qt_anchor + '  -DQt5_DIR=C:/msys64/mingw64/lib/cmake/Qt5 \\\n'
+if '-DQt5_DIR=C:/msys64/mingw64/lib/cmake/Qt5' not in b:
+    if b.count(qt_anchor) != 1:
+        raise SystemExit(f'[FAIL] Qt5 CMake anchor count={b.count(qt_anchor)}')
+    b = b.replace(qt_anchor, qt_line, 1)
+
 cmake_anchor = 'rm -rf jtdx/build-superhound\ncmake -S jtdx -B jtdx/build-superhound -G Ninja \\\n'
-preflight = '''# Native OmniRig COM preflight.\nOMNIRIG_AXSERVER="$(dumpcpp -getfile {4FE359C5-A58F-459D-BE95-CA559FB4F270} 2>/dev/null | tr -d '\\r' || true)"\nif [ -z "$OMNIRIG_AXSERVER" ]; then\n  echo '[FAIL] OmniRig COM server/type library is not registered on this Windows host'\n  exit 38\nfi\necho "[PASS] OmniRig COM type library: $OMNIRIG_AXSERVER"\n\nrm -rf jtdx/build-superhound\ncmake -S jtdx -B jtdx/build-superhound -G Ninja \\\n'''
+preflight = '''# Native OmniRig COM + Qt5 preflight.\nOMNIRIG_AXSERVER="$(dumpcpp -getfile {4FE359C5-A58F-459D-BE95-CA559FB4F270} 2>/dev/null | tr -d '\\r' || true)"\nif [ -z "$OMNIRIG_AXSERVER" ]; then\n  echo '[FAIL] OmniRig COM server/type library is not registered on this Windows host'\n  exit 38\nfi\necho "[PASS] OmniRig COM type library: $OMNIRIG_AXSERVER"\nif [ ! -f /mingw64/lib/cmake/Qt5/Qt5Config.cmake ]; then\n  echo '[FAIL] Qt5Config.cmake missing after MSYS2 dependency installation'\n  exit 45\nfi\necho '[PASS] Qt5 CMake package present'\n\nrm -rf jtdx/build-superhound\ncmake -S jtdx -B jtdx/build-superhound -G Ninja \\\n'''
 if '[PASS] OmniRig COM type library:' not in b:
     if b.count(cmake_anchor) != 1:
         raise SystemExit(f'[FAIL] OmniRig CMake preflight anchor count={b.count(cmake_anchor)}')
@@ -122,8 +140,11 @@ bp.write_text(b, encoding='utf-8', newline='\n')
 
 for needle in [
     marker,
+    "'600s',",
     '-DJTDX_ENABLE_OMNIRIG=ON',
     'lrelease-qt5 dumpcpp-qt5',
+    '-DQt5_DIR=C:/msys64/mingw64/lib/cmake/Qt5',
+    '[PASS] Qt5 CMake package present',
     '[PASS] OmniRig COM type library:',
     'JTDX_ENABLE_OMNIRIG:BOOL=ON',
     "MSI_VERSION='2.2.201'",
