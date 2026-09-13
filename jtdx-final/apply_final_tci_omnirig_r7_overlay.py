@@ -25,7 +25,7 @@ if not pp.exists() or not bp.exists():
 s = pp.read_text(encoding='utf-8')
 marker = '# SQ4KOU R7: RX QSY acknowledgement wait is target-specific, not signal-specific.'
 if marker not in s:
-    block = r'''
+    block = r"""
 
 # SQ4KOU R7: RX QSY acknowledgement wait is target-specific, not signal-specific.
 # tci_done1 is shared by VFO, mode, ready/start/audio and other TCI paths. The
@@ -44,7 +44,7 @@ if '#include <QElapsedTimer>' not in t:
     t = t.replace(inc_old, inc_new, 1)
 
 old = '''          sendTextMessage(cmd);\n          mysleep1(2000);\n//      if (band_change) mysleep1(500);\n          if (requested_rx_frequency_ == rx_frequency_) update_rx_frequency (f);\n'''
-new = '''          sendTextMessage(cmd);\n          // SQ4KOU R7: tci_done1 is shared by unrelated TCI messages. A single\n          // mysleep1(2000) can return early on mode/ready/audio/etc. Keep waiting\n          // until the requested VFO0 value is actually observed or 2 s elapse.\n          QElapsedTimer rx_ack_wait;\n          rx_ack_wait.start();\n          while (requested_rx_frequency_ != rx_frequency_ && inConnected &&\n                 rx_ack_wait.elapsed() < 2000) {\n            int const left = 2000 - static_cast<int>(rx_ack_wait.elapsed());\n            mysleep1(left > 250 ? 250 : left);\n          }\n\n          // A genuine timeout gets one bounded resend. This covers a dropped\n          // WebSocket command/notification without turning transient traffic into\n          // a modal TRCVR failure. We still fail if the target never arrives.\n          if (requested_rx_frequency_ != rx_frequency_ && inConnected && _power_) {\n            sendTextMessage(cmd);\n            rx_ack_wait.restart();\n            while (requested_rx_frequency_ != rx_frequency_ && inConnected &&\n                   rx_ack_wait.elapsed() < 1000) {\n              int const left = 1000 - static_cast<int>(rx_ack_wait.elapsed());\n              mysleep1(left > 250 ? 250 : left);\n            }\n          }\n//      if (band_change) mysleep1(500);\n          if (requested_rx_frequency_ == rx_frequency_) update_rx_frequency (f);\n'''
+new = '''          sendTextMessage(cmd);\n          // SQ4KOU R7: tci_done1 is shared by unrelated TCI messages. A single\n          // mysleep1(2000) can return early on mode/ready/audio/etc. Keep waiting\n          // until the requested VFO0 value is actually observed or 2 s elapse.\n          QElapsedTimer rx_ack_wait;\n          rx_ack_wait.start();\n          while (requested_rx_frequency_ != rx_frequency_ && inConnected &&\n                 rx_ack_wait.elapsed() < 2000) {\n            int const left = 2000 - static_cast<int>(rx_ack_wait.elapsed());\n            if (left <= 0) break;\n            mysleep1(left > 250 ? 250 : left);\n          }\n\n          // A genuine timeout gets one bounded resend. This covers a dropped\n          // WebSocket command/notification without turning transient traffic into\n          // a modal TRCVR failure. We still fail if the target never arrives.\n          if (requested_rx_frequency_ != rx_frequency_ && inConnected && _power_) {\n            sendTextMessage(cmd);\n            rx_ack_wait.restart();\n            while (requested_rx_frequency_ != rx_frequency_ && inConnected &&\n                   rx_ack_wait.elapsed() < 1000) {\n              int const left = 1000 - static_cast<int>(rx_ack_wait.elapsed());\n              if (left <= 0) break;\n              mysleep1(left > 250 ? 250 : left);\n            }\n          }\n//      if (band_change) mysleep1(500);\n          if (requested_rx_frequency_ == rx_frequency_) update_rx_frequency (f);\n'''
 if new not in t:
     if t.count(old) != 1:
         raise SystemExit(f'[FAIL] R7 do_frequency wait anchor count={t.count(old)}')
@@ -59,6 +59,7 @@ for needle in [
     'rx_ack_wait.elapsed() < 2000',
     'rx_ack_wait.restart();',
     'rx_ack_wait.elapsed() < 1000',
+    'if (left <= 0) break;',
     'requested_rx_frequency_ != rx_frequency_ && inConnected',
     'if (requested_rx_frequency_ == rx_frequency_) update_rx_frequency (f);',
     'error_ = tr ("TCI failed set rxfreq");',
@@ -71,7 +72,7 @@ forbidden = '''          sendTextMessage(cmd);\n          mysleep1(2000);\n//   
 if forbidden in t:
     raise SystemExit('[FAIL] R7 still contains native signal-specific RX-QSY wait')
 print('[PASS] R7 target-specific RX-QSY acknowledgement wait + bounded resend')
-'''
+"""
     s += block
     pp.write_text(s, encoding='utf-8', newline='\n')
 
