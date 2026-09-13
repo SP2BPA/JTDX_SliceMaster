@@ -1,0 +1,43 @@
+name: Fix ActiveQt dumpcpp tool name
+
+on:
+  push:
+    branches:
+      - fix/tci-stability-reconnect
+    paths:
+      - '.github/workflows/fix-dumpcpp-qt5.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch overlay generator for current MSYS2 ActiveQt naming
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('jtdx-final/apply_tci_stability_omnirig_overlay.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace(
+              "new_tools = 'for t in git gcc g++ gfortran cmake ninja autoconf automake libtoolize make pkg-config patch qmake-qt5 lrelease-qt5 dumpcpp; do\\n'",
+              "new_tools = 'for t in git gcc g++ gfortran cmake ninja autoconf automake libtoolize make pkg-config patch qmake-qt5 lrelease-qt5 dumpcpp-qt5; do\\n'"
+          )
+          s=s.replace("'lrelease-qt5 dumpcpp',", "'lrelease-qt5 dumpcpp-qt5',")
+          marker="if new_tools not in b:\n    if b.count(old_tools) != 1:\n        raise SystemExit(f'[FAIL] OmniRig tool gate anchor count={b.count(old_tools)}')\n    b = b.replace(old_tools, new_tools, 1)\n\n"
+          if marker not in s:
+              raise SystemExit('tool gate block anchor missing')
+          alias_block = marker + "alias_anchor = 'ln -sf /mingw64/bin/windeployqt-qt5.exe \\\"$WORK/bin/windeployqt.exe\\\"\\n'\nalias_new = alias_anchor + 'ln -sf /mingw64/bin/dumpcpp-qt5.exe \\\"$WORK/bin/dumpcpp.exe\\\"\\n'\nif alias_new not in b:\n    if b.count(alias_anchor) != 1:\n        raise SystemExit(f'[FAIL] dumpcpp alias anchor count={b.count(alias_anchor)}')\n    b = b.replace(alias_anchor, alias_new, 1)\n\n"
+          s=s.replace(marker,alias_block,1)
+          if 'dumpcpp-qt5' not in s or 'dumpcpp.exe' not in s:
+              raise SystemExit('dumpcpp adaptation postcheck failed')
+          p.write_text(s,encoding='utf-8',newline='\n')
+      - name: Commit correction
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add jtdx-final/apply_tci_stability_omnirig_overlay.py
+          git commit -m 'Support current dumpcpp-qt5 ActiveQt tool name'
+          git push origin HEAD:fix/tci-stability-reconnect
