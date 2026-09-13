@@ -1,0 +1,37 @@
+name: Fix TCI overlay accessor
+
+on:
+  push:
+    branches:
+      - fix/tci-stability-reconnect
+    paths:
+      - '.github/workflows/fix-overlay-accessor.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply known accessor correction
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('jtdx-final/apply_tci_stability_omnirig_overlay.py')
+          s=p.read_text(encoding='utf-8')
+          old='return (index >= 0 && index < args.size()) ? args.at(index) : QString();'
+          new='return (index >= 0 && index < args.size()) ? args.value(index) : QString();'
+          if new not in s:
+              if s.count(old)!=1:
+                  raise SystemExit(f'accessor anchor count={s.count(old)}')
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8',newline='\n')
+      - name: Commit correction
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add jtdx-final/apply_tci_stability_omnirig_overlay.py
+          git commit -m 'Use value() in TCI argument accessor'
+          git push origin HEAD:fix/tci-stability-reconnect
