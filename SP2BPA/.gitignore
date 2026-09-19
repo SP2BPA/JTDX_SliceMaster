@@ -1,0 +1,15 @@
+# SP2BPA local build artifacts
+_JTDX_SUPERHOUND_CACHE/
+WORK/
+OUTPUT/
+LOGS/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Local IDE/editor files
+.vscode/
+.idea/
+*.user
+*.suo
