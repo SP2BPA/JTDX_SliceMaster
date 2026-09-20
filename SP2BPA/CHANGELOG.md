@@ -1,6 +1,8 @@
 # Changelog — SP2BPA JTDX Slice Master
 
-## v0.3d Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+## v0.3e Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+
+**Hotfix v0.3e:** po poprawieniu `wsprd_jtdx` build doszedł jeszcze dalej (ok. 1167/1219) i ujawnił ten sam problem w targetach C++ konsumujących statyczne biblioteki Fortrana `wsjt_fort` / `wsjt_fort_omp`: brak propagacji `libgfortran` przy linkowaniu. v0.3e dodaje `gfortran` jako PUBLIC zależność tych bibliotek tylko dla GNU/MinGW oraz pre-build gate dla `jtdx` i `jtdxjt9`. Funkcjonalność aplikacji bez zmian.
 
 **Hotfix v0.3d:** pełny log v0.3c potwierdził poprawną konfigurację i dojście do kroku 1037/1219. Rzeczywista awaria była w linkowaniu `wsprd_jtdx.exe`: target zawiera obiekty Fortrana, ale link wykonywany przez `c++.exe` nie zawierał `-lgfortran`, co dało `_gfortran_runtime_error_at`, `_gfortran_stop_string` i `_gfortran_cshift0_4`. v0.3d dodaje runtime gfortran wyłącznie do `wsprd_jtdx` na GNU/MinGW i gate sprawdzający komendę Ninja przed pełnym buildem. Bez zmian funkcjonalnych programu.
 
