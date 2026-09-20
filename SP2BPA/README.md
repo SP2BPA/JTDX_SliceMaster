@@ -1,40 +1,53 @@
 # JTDX Slice Master — SP2BPA
 
-Ta część repozytorium dokumentuje rozwój wersji JTDX przygotowanej pod stację SP2BPA i Slice Master 6000.
+Warstwa projektu rozwijana dla stacji SP2BPA na bazie `SQ4KOU/JTDX_SuperHound`.
 
-## Baza projektu
+## Stabilne wydanie
 
-- upstream/fork base: `SQ4KOU/JTDX_SuperHound`
-- JTDX base: 2.2.159
-- zachowane funkcje: FT8, FT2, SuperHound oraz standardowy dekoder/DSP JTDX
-- Thetis nie jest rozwijany w tej gałęzi i nie jest częścią zakresu prac SP2BPA
+**v0.3h — zweryfikowane na stacji 2026-09-20**
 
-## Aktualny stan — 2026-09-19
+Baza:
+- JTDX 2.2.159
+- FT8
+- FT2
+- SuperHound
+- standardowy dekoder/DSP JTDX
 
-Status: **wersja robocza działająca i używana na stacji**.
+Potwierdzone w pracy:
+- zaakceptowany układ GUI z kompletnym WideGraph/wodospadem w prawej górnej części głównego okna,
+- FT8 / FT2 / SuperHound pozostają funkcjonalnie bez zmian,
+- CAT przez Slice Master 6000: Hamlib `FlexRadio 6xxx`,
+- Slice A: `127.0.0.1:7821`,
+- Slice B: `127.0.0.1:7822`,
+- PTT: CAT,
+- opcjonalny bezpośredni odczyt bazy Log4OM 2 SQLite dla statusu Worked/New,
+- baza Log4OM otwierana wyłącznie do odczytu,
+- automatyczny fallback do `wsjtx_log.adi`,
+- lokalny `wsjtx_log.adi` nadal obsługuje lokalny licznik QSO JTDX.
 
-Potwierdzone:
-- FT8 działa i dekoduje poprawnie
-- FT2 pozostaje zaimplementowany
-- SuperHound pozostaje zaimplementowany
-- WideGraph/wodospad został osadzony w prawej górnej części głównego okna JTDX
-- cały WideGraph pozostaje razem z kontrolkami, suwakami i skalą
-- pozostały układ GUI został zachowany
-- działające sterowanie CAT przez Slice Master 6000 używa Hamlib `FlexRadio 6xxx`
-- Slice A: `127.0.0.1:7821`
-- Slice B: `127.0.0.1:7822`
-- PTT: CAT
+## Log4OM 2
 
-## Ważne
+W `Ustawienia -> Zaawansowane -> Log4OM 2` można wskazać bazę SQLite Log4OM i włączyć ją jako źródło informacji dla:
+- New DXCC,
+- New Call,
+- New Grid,
+- New Prefix,
+- statusów wg pasma/emisji.
 
-Listener HRD Slice Mastera (7811/7812) został przetestowany, ale nie jest obecnie używaną ścieżką dla tej wersji JTDX. Połączenie TCP było zestawiane, lecz handshake HRD nie kończył się poprawnie. Stabilna konfiguracja korzysta z CAT TCP 782x i sterownika Hamlib FlexRadio 6xxx.
+Funkcja jest opt-in. Gdy jest wyłączona lub baza jest niedostępna, JTDX zachowuje standardowe działanie.
 
-Automatyczne uruchamianie JTDX z GUI Slice Mastera nie jest obecnie wymagane. JTDX jest uruchamiany ręcznie z ikony i pracuje poprawnie.
+## Slice Master
 
-## Struktura katalogu SP2BPA
+Stabilna ścieżka CAT dla JTDX korzysta z portów 782x. Emulacja HRD 781x była testowana, ale nie jest używana jako konfiguracja robocza.
 
-- `docs/` — bieżąca konfiguracja i opis budowania
-- `builder/` — informacje o zweryfikowanym builderze i sumy kontrolne
-- `CHANGELOG.md` — historia zmian wykonanych przez SP2BPA/OpenAI
+## Zakres repozytorium
 
-Kod upstream pozostaje poza tym katalogiem, dzięki czemu łatwo rozróżnić bazę SQ4KOU od naszych zmian.
+Thetis pozostaje częścią upstreamowego forka, ale **nie jest rozwijany w warstwie SP2BPA**.
+
+Katalog:
+- `docs/` — konfiguracja i dokumentacja,
+- `builder/` — audyty i informacje buildowe,
+- `release/` — metadane stabilnego wydania,
+- `CHANGELOG.md` — historia zmian.
+
+Kod upstream pozostaje poza katalogiem `SP2BPA/`, dzięki czemu baza SQ4KOU i nasze zmiany są łatwe do rozróżnienia.
