@@ -1,6 +1,8 @@
 # Changelog — SP2BPA JTDX Slice Master
 
-## v0.3e Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+## v0.3f Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+
+**Hotfix v0.3f:** v0.3e zatrzymał się podczas konfiguracji CMake, zanim ruszył pełny build. Przyczyna: upstream JTDX używa dla `wsjt_fort` i `wsjt_fort_omp` starej/plain składni `target_link_libraries`, a v0.3e dołożył dla tych samych targetów składnię keyword `PUBLIC`. CMake nie pozwala mieszać tych dwóch form. v0.3f dodaje `gfortran` tą samą, plain składnią. W tym projekcie plain link interface pozostaje tranzytywny, więc `-lgfortran` nadal przechodzi do konsumentów C++. Funkcjonalność programu bez zmian.
 
 **Hotfix v0.3e:** po poprawieniu `wsprd_jtdx` build doszedł jeszcze dalej (ok. 1167/1219) i ujawnił ten sam problem w targetach C++ konsumujących statyczne biblioteki Fortrana `wsjt_fort` / `wsjt_fort_omp`: brak propagacji `libgfortran` przy linkowaniu. v0.3e dodaje `gfortran` jako PUBLIC zależność tych bibliotek tylko dla GNU/MinGW oraz pre-build gate dla `jtdx` i `jtdxjt9`. Funkcjonalność aplikacji bez zmian.
 
