@@ -1,6 +1,6 @@
 # Log4OM 2 — bezpośrednie źródło historii QSO
 
-Status: **gałąź eksperymentalna / przed testem na prawdziwej bazie SP2BPA**.
+Status: **v0.3a — implementacja przygotowana i schemat zweryfikowany na prawdziwej bazie SP2BPA; przed kompilacją/testem MSI na stacji**.
 
 ## Cel
 
@@ -67,4 +67,4 @@ Wersja robocza: `v0.3 Log4OM`.
 
 Builder wymaga QtSql i sprawdza obecność sterownika `sqldrivers/qsqlite.dll`. Instalator nie powinien zostać zaakceptowany przez gate buildu, jeśli sterownik SQLite nie trafi do paczki.
 
-Przed uznaniem tej wersji za stabilną należy wykonać test na kopii rzeczywistej bazy Log4OM SP2BPA.
+Schemat został już zweryfikowany na kopii rzeczywistej bazy Log4OM SP2BPA: 1543 QSO, 98 kolumn, 240 różnych wartości DXCC, tabela `Log`, komplet potrzebnych pól. Przed uznaniem wersji za stabilną pozostaje kompilacja MSI i test funkcjonalny w działającym JTDX.
