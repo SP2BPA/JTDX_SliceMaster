@@ -1,6 +1,8 @@
 # Changelog — SP2BPA JTDX Slice Master
 
-## v0.3g Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+## v0.3h Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+
+**Hotfix v0.3h:** v0.3g skompilował cały program i przeszedł audyty źródłowe; awaria nastąpiła dopiero podczas CPack/WiX. Przyczyną było pakowanie całego katalogu Qt `sqldrivers`, przez co BundleUtilities próbował analizować nieużywany `qsqlibase.dll` i jego zależność Firebird `fbclient.dll`. v0.3h pakuje wyłącznie wymagany `plugins/sqldrivers/qsqlite.dll` i ma gate odrzucający `qsqlibase.dll` / `fbclient.dll` w stagingu. Bez zmian funkcjonalnych programu.
 
 **Hotfix v0.3g:** pełny build v0.3f doszedł do **1213/1219**. Jedyny twardy błąd był w `Configuration.cpp`: wygenerowana klasa UI nie zawierała `label_11`, którego upstream JTDX używa do obrazu `decpasses.png`. Patcher Log4OM zastąpił cały prawy layout zakładki Advanced i nie zachował tego QLabel. v0.3g przywraca `label_11` w tym samym layoucie obok nowego panelu Log4OM i dodaje gate pilnujący, aby widget nie został ponownie usunięty. Bez zmian logiki programu.
 
