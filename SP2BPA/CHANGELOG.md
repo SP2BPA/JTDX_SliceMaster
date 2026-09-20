@@ -1,6 +1,8 @@
 # Changelog — SP2BPA JTDX Slice Master
 
-## v0.3c Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+## v0.3d Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+
+**Hotfix v0.3d:** pełny log v0.3c potwierdził poprawną konfigurację i dojście do kroku 1037/1219. Rzeczywista awaria była w linkowaniu `wsprd_jtdx.exe`: target zawiera obiekty Fortrana, ale link wykonywany przez `c++.exe` nie zawierał `-lgfortran`, co dało `_gfortran_runtime_error_at`, `_gfortran_stop_string` i `_gfortran_cshift0_4`. v0.3d dodaje runtime gfortran wyłącznie do `wsprd_jtdx` na GNU/MinGW i gate sprawdzający komendę Ninja przed pełnym buildem. Bez zmian funkcjonalnych programu.
 
 **Hotfix v0.3c:** build v0.3b doszedł dalej, ale zatrzymał się w pomocniczym teście CMake `FortranCInterface_VERIFY(CXX)`. W wygenerowanej komendzie linkera brakowało `libgfortran`, dlatego symbole `_gfortran_st_write*` pozostawały nierozwiązane. v0.3c sprawdza obecność runtime GNU Fortran i tylko na GNU/MinGW omija ten znany fałszywie negatywny preflight; właściwa kompilacja/link całego JTDX pozostaje twardym gate.
 
