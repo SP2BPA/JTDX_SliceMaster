@@ -1,6 +1,8 @@
 # Changelog — SP2BPA JTDX Slice Master
 
-## v0.3h Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+## v0.3h Log4OM — ZWERYFIKOWANA NA STACJI — 2026-09-20
+
+**Weryfikacja na stacji SP2BPA:** instalacja MSI zakończona poprawnie. JTDX uruchamia się prawidłowo, CAT i audio działają, GUI/WideGraph pozostały bez zmian, a opcjonalna baza Log4OM 2 działa jako źródło Worked/New. Po przywróceniu lokalnego `wsjtx_log.adi` licznik JTDX pozostał lokalny, podczas gdy New DXCC / worked status korzystał z pełnej bazy Log4OM. Zachowany został fallback do `wsjtx_log.adi`.
 
 **Hotfix v0.3h:** v0.3g skompilował cały program i przeszedł audyty źródłowe; awaria nastąpiła dopiero podczas CPack/WiX. Przyczyną było pakowanie całego katalogu Qt `sqldrivers`, przez co BundleUtilities próbował analizować nieużywany `qsqlibase.dll` i jego zależność Firebird `fbclient.dll`. v0.3h pakuje wyłącznie wymagany `plugins/sqldrivers/qsqlite.dll` i ma gate odrzucający `qsqlibase.dll` / `fbclient.dll` w stagingu. Bez zmian funkcjonalnych programu.
 
