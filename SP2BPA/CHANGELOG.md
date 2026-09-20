@@ -1,6 +1,8 @@
 # Changelog — SP2BPA JTDX Slice Master
 
-## v0.3f Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+## v0.3g Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+
+**Hotfix v0.3g:** pełny build v0.3f doszedł do **1213/1219**. Jedyny twardy błąd był w `Configuration.cpp`: wygenerowana klasa UI nie zawierała `label_11`, którego upstream JTDX używa do obrazu `decpasses.png`. Patcher Log4OM zastąpił cały prawy layout zakładki Advanced i nie zachował tego QLabel. v0.3g przywraca `label_11` w tym samym layoucie obok nowego panelu Log4OM i dodaje gate pilnujący, aby widget nie został ponownie usunięty. Bez zmian logiki programu.
 
 **Hotfix v0.3f:** v0.3e zatrzymał się podczas konfiguracji CMake, zanim ruszył pełny build. Przyczyna: upstream JTDX używa dla `wsjt_fort` i `wsjt_fort_omp` starej/plain składni `target_link_libraries`, a v0.3e dołożył dla tych samych targetów składnię keyword `PUBLIC`. CMake nie pozwala mieszać tych dwóch form. v0.3f dodaje `gfortran` tą samą, plain składnią. W tym projekcie plain link interface pozostaje tranzytywny, więc `-lgfortran` nadal przechodzi do konsumentów C++. Funkcjonalność programu bez zmian.
 
