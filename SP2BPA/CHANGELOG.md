@@ -1,5 +1,17 @@
 # Changelog — SP2BPA JTDX Slice Master
 
+## v0.3 Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+
+- dodawane jest opcjonalne, bezpośrednie źródło historii QSO z bazy Log4OM 2 SQLite
+- wybór pliku bazy ma być dostępny w `Ustawienia -> Zaawansowane -> Log4OM 2`
+- funkcja jest domyślnie wyłączona, więc dotychczasowe zachowanie JTDX pozostaje bez zmian
+- baza Log4OM jest otwierana wyłącznie do odczytu; JTDX nie zapisuje do niej żadnych danych
+- przy braku bazy, błędzie otwarcia lub niezgodnej strukturze następuje automatyczny fallback do `wsjtx_log.adi`
+- zachowana zostaje oryginalna logika JTDX dla New DXCC / New Call / Grid / Prefix / pasmo / emisja; zmienia się tylko źródło informacji o wykonanych QSO
+- planowane jest automatyczne przeładowanie po zmianie pliku SQLite / pliku WAL
+- do buildu dodawany jest QtSql oraz sterownik SQLite `qsqlite.dll`
+- bez zmian w FT8, FT2, SuperHound, dekoderze, CAT/PTT, WideGraph i integracji Slice Master
+
 ## v0.2 / v0.2a — 2026-09-19
 
 - zachowano zaakceptowane GUI z v0.1
