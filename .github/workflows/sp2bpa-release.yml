@@ -1,0 +1,54 @@
+name: SP2BPA Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'SP2BPA/release/VERSION'
+      - 'SP2BPA/release/RELEASE_NOTES.md'
+      - 'SP2BPA/release/CHECKSUMS.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: contains(github.event.head_commit.message, '[release]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          VERSION="$(tr -d '\r\n' < SP2BPA/release/VERSION)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build SP2BPA source/documentation bundle
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          zip -r "JTDX_SliceMaster_${VERSION}_SP2BPA_sources.zip" SP2BPA \
+            -x 'SP2BPA/release/VERSION'
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            gh release edit "$VERSION" \
+              --title "JTDX SuperHound FT2 SliceMaster $VERSION — Log4OM 2" \
+              --notes-file SP2BPA/release/RELEASE_NOTES.md
+          else
+            gh release create "$VERSION" \
+              --target "$GITHUB_SHA" \
+              --title "JTDX SuperHound FT2 SliceMaster $VERSION — Log4OM 2" \
+              --notes-file SP2BPA/release/RELEASE_NOTES.md
+          fi
+          gh release upload "$VERSION" "JTDX_SliceMaster_${VERSION}_SP2BPA_sources.zip" --clobber
+          gh release upload "$VERSION" SP2BPA/release/CHECKSUMS.txt --clobber
