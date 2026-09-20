@@ -1,6 +1,8 @@
 # Changelog — SP2BPA JTDX Slice Master
 
-## v0.3a Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+## v0.3b Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+
+**Hotfix v0.3b:** pierwszy build v0.3a zatrzymał się na gate `git diff --check` z powodu istniejących wcześniej spacji końcowych w kilku liniach `logbook.cpp`, które stały się liniami zmodyfikowanymi po przełączeniu źródła Worked/New. Patcher v0.3b usuwa whitespace wyłącznie z tych linii; nie zmienia logiki programu.
 
 - dodawane jest opcjonalne, bezpośrednie źródło historii QSO z bazy Log4OM 2 SQLite
 - wybór pliku bazy ma być dostępny w `Ustawienia -> Zaawansowane -> Log4OM 2`
