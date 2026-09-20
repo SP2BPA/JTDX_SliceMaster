@@ -1,6 +1,8 @@
 # Changelog — SP2BPA JTDX Slice Master
 
-## v0.3b Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+## v0.3c Log4OM — W TRAKCIE TESTÓW — 2026-09-20
+
+**Hotfix v0.3c:** build v0.3b doszedł dalej, ale zatrzymał się w pomocniczym teście CMake `FortranCInterface_VERIFY(CXX)`. W wygenerowanej komendzie linkera brakowało `libgfortran`, dlatego symbole `_gfortran_st_write*` pozostawały nierozwiązane. v0.3c sprawdza obecność runtime GNU Fortran i tylko na GNU/MinGW omija ten znany fałszywie negatywny preflight; właściwa kompilacja/link całego JTDX pozostaje twardym gate.
 
 **Hotfix v0.3b:** pierwszy build v0.3a zatrzymał się na gate `git diff --check` z powodu istniejących wcześniej spacji końcowych w kilku liniach `logbook.cpp`, które stały się liniami zmodyfikowanymi po przełączeniu źródła Worked/New. Patcher v0.3b usuwa whitespace wyłącznie z tych linii; nie zmienia logiki programu.
 
